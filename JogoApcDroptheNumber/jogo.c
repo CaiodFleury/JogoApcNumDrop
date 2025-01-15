@@ -4,6 +4,7 @@
 #include <conio.h>
 #include <windows.h>
 #include <time.h>
+#include <math.h>
 
 struct ranks
 {
@@ -360,28 +361,35 @@ int construirjogo(int dificuldade, int matriz[dificuldade][dificuldade], int sel
     // i muda a linha j muda a coluna
     system("cls");
     int total = 0;
+    int resp = 1;
+    int numprint;
+    int tamnum;
 
-    for (int i = 0; i < (rows - dificuldade) /2 -1; ++i)
+    for (int i = 0; i < (rows - dificuldade*5) /2 -1; ++i)
     {
         printf("\n");
     }
-    for (int j = 0; j < (columns - (dificuldade * 3)-13)/2 +(selecionado*3); ++j)
+    for (int j = 0; j < ((columns - (dificuldade * 10))-2)/2 + selecionado * 10 - 4; ++j)
     {
         printf(" ");
     }
-    printf(" %d \n",nextnum);
-    for (int i = 0; i < dificuldade + 2; ++i)
+    while(nextnum > 0)
     {
-        for (int j = 0; j < (columns - (dificuldade * 3)-9)/2; ++j)
+        resp = resp *2;
+        nextnum-=1;
+    }
+    printf(" %d \n",resp);
+    for (int i = 0; i < dificuldade*5 + 2; ++i)
+    {
+        for (int j = 0; j < ((columns - (dificuldade * 10))-2)/2; ++j)
         {
             printf(" ");
         }
-        for (int j = 0; j < dificuldade + 2; ++j)
+        for (int j = 0; j < dificuldade*10 + 2; ++j)
         {
-
             if (j == 0)
             {
-                if (i != 0 && i != dificuldade+1)
+                if (i != 0 && i != dificuldade*5+1)
                 {
                     printf("%c",186);
                 }
@@ -394,9 +402,9 @@ int construirjogo(int dificuldade, int matriz[dificuldade][dificuldade], int sel
                     printf("%c",200);
                 }
             }
-            else if (j == dificuldade+1)
+            else if (j == dificuldade*10+1)
             {
-                if (i != 0 && i != dificuldade+1)
+                if (i != 0 && i != dificuldade*5+1)
                 {
                     printf("%c",186);
                 }
@@ -411,33 +419,77 @@ int construirjogo(int dificuldade, int matriz[dificuldade][dificuldade], int sel
             }
             else if(i == 0)
             {
-                if (j == selecionado)
+                if ((j-1)/10 == selecionado-1 && (j-1)%10 == 6)
                 {
-                    printf("%c%c%c", 205,206,205);
+                    printf("%c", 206);
                 }
                 else
                 {
-                    printf("%c%c%c", 205,205,205);
+                    printf("%c", 205);
                 }
             }
-            else if (i == dificuldade+1)
+            else if (i == dificuldade*5+1)
             {
-                printf("%c%c%c", 205,205,205);
+                printf("%c", 205);
             }
-            else if(i == 0)
-            {   
-                printf("   ");
+            else if (matriz[(i-1)/5][(j-1)/10] != 0)
+            {
+                numprint = pow(2,matriz[(i-1)/5][(j-1)/10]);
+                tamnum = 0;
+                while(numprint>0)
+                {
+                    tamnum +=1;
+                    numprint = numprint/10;
+                }
+                numprint = pow(2,matriz[(i-1)/5][(j-1)/10]);
+                if ((j-1)%10 == 0 || (j-1)%10 == 9)
+                {
+                    if ((i-1)%5 == 0)
+                    {
+                        if ((j-1)%10 == 0)
+                        {
+                            printf("%c",201);
+                        }
+                        else
+                        {
+                            printf("%c",187);
+                        }
+                    }
+                    else if((i-1)%5 == 4)
+                    {
+                        if ((j-1)%10 == 0)
+                        {
+                            printf("%c",200);
+                        }
+                        else
+                        {
+                            printf("%c",188);
+                        }
+                    }
+                    else
+                    {
+                        printf("%c",186);
+                    }
+                }
+                else if((i-1)%5 == 0 || (i-1)%5 == 4)
+                {
+                    printf("%c",205);
+                }
+                else if ((i-1)%5 == 2 && (j-1)%10 == 5)
+                {
+                    printf("%d",numprint);
+                }
+                else
+                {
+                    if (!((i-1)%5 == 2 && (j-1)%10 < tamnum))
+                    {
+                        printf(" ");
+                    }
+                }
             }
             else
             {
-                if (matriz[i-1][j-1] == 0)
-                {
-                    printf("   ");
-                }
-                else
-                {
-                    printf(" %d ",matriz[i-1][j-1]);
-                }
+                printf(" ");
             }
         }
         printf("\n");
