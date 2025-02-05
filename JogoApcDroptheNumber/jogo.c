@@ -16,31 +16,45 @@ CONSOLE_SCREEN_BUFFER_INFO csbi;
 int columns, rows;
 
 //Geral:
-int certeza(char *texto);
+int certeza();
 int DimencionarTela();
 
 // Coisas do Menu:
 int menu();
-void construirmenu(int colunas, int linhas, int selected);
-void printmenu(int colunas, char*palavra);
+void construirmenu();
+void printmenu();
 
 // Coisas do Jogo:
 int jogo();
-int adjacentester(int matriz[5][5],int y,int x);
-int administrarniveis(int dificuldade);
-int construirjogo(int dificuldade, int matriz[dificuldade][dificuldade],int selecionado,int nextnum);
-void perguntarnomejogo(char *palavra);
+int adjacentester();
+int administrarniveis();
+int construirjogo();
+void perguntarnomejogo();
 
 //Coisa dos ranks:
-struct ranks* organizar(struct ranks*first, int rank, char * nome);
+struct ranks* organizar();
 int rank();
-void criarank(int posicao);
+void criarank();
 
-
-
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define BLU   "\x1B[34m"
+#define MAG   "\x1B[35m"
+#define CYN   "\x1B[36m"
+#define WHT   "\x1B[37m"
+#define RESET "\x1B[0m"
 
 int main()
 {
+    printf(RED "red\n"     RESET);
+    printf(GRN "green\n"   RESET);
+    printf(YEL "yellow\n"  RESET);
+    printf(BLU "blue\n"    RESET);
+    printf(MAG "magenta\n" RESET);
+    printf(CYN "cyan\n"    RESET);
+    printf(WHT "white\n"   RESET);
+    return 0;
     DimencionarTela();
     system("cls");
     int tela = 0;
@@ -84,7 +98,7 @@ int menu()
             n = getch();
             switch(n)
             {
-                case 72:
+                case 'w':
                     if (posicao != 3)
                     {
                         posicao+=1;
@@ -92,7 +106,7 @@ int menu()
                     }
                 break;
 
-                case 80:
+                case 's':
                     if (posicao != 1)
                     {
                         posicao-=1;
@@ -175,9 +189,20 @@ int jogo()
     int temp;
     char ntemp[10];
     char nome[10];
+    FILE * testef = fopen("numeros.txt","r");
+    if (testef == 0)
+    {
+        srand((unsigned) time(NULL));
+        testef = fopen("numeros.txt","w");
+        for (int i = 0; i < 500; ++i)
+        {
+            fprintf(testef, "%d\n", rand()%4+1);
+        }
+        fclose(testef);
+    }
     perguntarnomejogo(nome);
     system("cls");
-    int pontos = administrarniveis(5);
+    int pontos = administrarniveis();
     
 
     FILE* rank = fopen("ranks.bin", "rb");
@@ -199,73 +224,19 @@ int jogo()
     fclose(rank);
 }
 
-int adjacentester(int matriz[5][5],int y,int x)
+int administrarniveis()
 {
-    int mudou = 0;
-    int num = matriz[y][x];
-    if (num == 0)
-    {
-        return 0;
-    }
-    if (x < 4 && matriz[y][x+1] == num)
-    {
-        matriz[y][x+1] = 0;
-        matriz[y][x] +=1;
-        mudou = 1;
-    }
-    if (y > 0 && matriz[y-1][x] == num)
-    {
-        matriz[y-1][x] = 0;
-        matriz[y][x] +=1;
-        mudou = 1;
-    }
-    if (x > 0 && matriz[y][x-1] == num)
-    {
-        matriz[y][x-1] = 0;
-        matriz[y][x] +=1;
-        mudou = 1;
-    }
-    if (y < 4 && matriz[y+1][x] == num)
-    {
-        matriz[y+1][x] = 0;
-        matriz[y][x] +=1;
-        mudou = 1;
-    }
-    if (mudou == 1)
-    {
-        for (int i = 0; i < 5; ++i)
-        {
-            for (int j = 0; j < 4; ++j)
-            {
-                if (matriz[4 - j][i] == 0 && matriz[4 - j - 1][i] > 0)
-                {
-                    matriz[4 - j][i] = matriz[4 - j - 1][i];
-                    matriz[4 - j - 1][i] = 0;
-                }
-            }
-        }
-        for (int i = 0; i < 5; ++i)
-        {
-            for (int j = 0; j < 5; ++j)
-            {
-                adjacentester(matriz,j,i);
-            }
-        }
-    }
-    return 0;
-}
-
-int administrarniveis(int dificuldade)
-{
-    srand(time(NULL));
-    int nextnum = rand() % 3 + 1;   
+    FILE * fnumeros = fopen("numeros.txt","r");
+    int nextnum;
+    int nextnextnum;   
     int n;
     int atualizar = 1;
     int selecionado = 1;
-    int matriz[dificuldade][dificuldade];
-    for (int i = 0; i < dificuldade; ++i)
+    int matriz[7][5];
+    fscanf(fnumeros,"%d %d",&nextnum,&nextnextnum);
+    for (int i = 0; i < 7; ++i)
     {
-        for (int j = 0; j < dificuldade; ++j)
+        for (int j = 0; j < 5; ++j)
         {
             matriz[i][j] = 0;
         }
@@ -276,7 +247,7 @@ int administrarniveis(int dificuldade)
 
         if (atualizar == 1)
         {
-            construirjogo(dificuldade, matriz, selecionado,nextnum);
+            construirjogo(matriz, selecionado,nextnum,nextnextnum);
             atualizar = 0;
         }
 
@@ -289,7 +260,7 @@ int administrarniveis(int dificuldade)
             {
                 // <- 75,-> 77 ,^ 72, \/ 80
                 case 'd':
-                    if (selecionado < dificuldade)
+                    if (selecionado < 5)
                     {
                         selecionado+=1;
                         atualizar = 1;
@@ -305,7 +276,7 @@ int administrarniveis(int dificuldade)
                 break;
 
                 case 's':
-                    for (int i = 0; i < 5; ++i)
+                    for (int i = 0; i < 7; ++i)
                     {
                         if (matriz[i][selecionado-1] != 0)
                         {
@@ -314,7 +285,7 @@ int administrarniveis(int dificuldade)
                                 int pontos = 0;
                                 for (int i = 0; i < 5; ++i)
                                 {
-                                    for (int j = 0; j < 5; ++j)
+                                    for (int j = 0; j < 7; ++j)
                                     {
                                         pontos += matriz[j][i] * matriz[j][i];
                                     }
@@ -326,16 +297,28 @@ int administrarniveis(int dificuldade)
                                 matriz[i-1][selecionado-1] = nextnum;
                                 adjacentester(matriz,i-1,selecionado-1);
                             }
-                            i = 5;
+                            i = 7;
                         }
-                        else if (i == 4)
+                        else if (i == 6)
                         {
                             matriz[i][selecionado-1] = nextnum;
                             adjacentester(matriz,i,selecionado-1);
-                            i = 5;
+                            i = 7;
                         }
                     }
-                    nextnum = rand() % 3 + 1;
+                    nextnum = nextnextnum;
+                    if (fscanf(fnumeros,"%d",&nextnextnum) == EOF)
+                    {
+                        int pontos = 0;
+                        for (int i = 0; i < 5; ++i)
+                        {
+                            for (int j = 0; j < 7; ++j)
+                            {
+                                pontos += matriz[j][i] * matriz[j][i];
+                            }
+                        }
+                        return pontos;
+                    }
                     atualizar = 1;
                 break;
 
@@ -343,7 +326,7 @@ int administrarniveis(int dificuldade)
                     int pontos = 0;
                     for (int i = 0; i < 5; ++i)
                     {
-                        for (int j = 0; j < 5; ++j)
+                        for (int j = 0; j < 7; ++j)
                         {
                             pontos += matriz[j][i] * matriz[j][i];
                         }
@@ -356,7 +339,7 @@ int administrarniveis(int dificuldade)
     return 0;
 }
 
-int construirjogo(int dificuldade, int matriz[dificuldade][dificuldade], int selecionado , int nextnum)
+int construirjogo(int matriz[][5], int selecionado , int nextnum, int nextnextnum)
 {
     // i muda a linha j muda a coluna
     system("cls");
@@ -365,11 +348,11 @@ int construirjogo(int dificuldade, int matriz[dificuldade][dificuldade], int sel
     int numprint;
     int tamnum;
 
-    for (int i = 0; i < (rows - dificuldade*5) /2 -1; ++i)
+    for (int i = 0; i < (rows - 35) /2 -1; ++i)
     {
         printf("\n");
     }
-    for (int j = 0; j < ((columns - (dificuldade * 10))-2)/2 + selecionado * 10 - 4; ++j)
+    for (int j = 0; j < ((columns - 50)-2)/2 + selecionado * 10 - 4; ++j)
     {
         printf(" ");
     }
@@ -379,17 +362,17 @@ int construirjogo(int dificuldade, int matriz[dificuldade][dificuldade], int sel
         nextnum-=1;
     }
     printf(" %d \n",resp);
-    for (int i = 0; i < dificuldade*5 + 2; ++i)
+    for (int i = 0; i < 35 + 2; ++i)
     {
-        for (int j = 0; j < ((columns - (dificuldade * 10))-2)/2; ++j)
+        for (int j = 0; j < ((columns - 50)-2)/2; ++j)
         {
             printf(" ");
         }
-        for (int j = 0; j < dificuldade*10 + 2; ++j)
+        for (int j = 0; j < 50 + 2; ++j)
         {
             if (j == 0)
             {
-                if (i != 0 && i != dificuldade*5+1)
+                if (i != 0 && i != 36)
                 {
                     printf("%c",186);
                 }
@@ -402,9 +385,9 @@ int construirjogo(int dificuldade, int matriz[dificuldade][dificuldade], int sel
                     printf("%c",200);
                 }
             }
-            else if (j == dificuldade*10+1)
+            else if (j == 51)
             {
-                if (i != 0 && i != dificuldade*5+1)
+                if (i != 0 && i != 36)
                 {
                     printf("%c",186);
                 }
@@ -415,6 +398,7 @@ int construirjogo(int dificuldade, int matriz[dificuldade][dificuldade], int sel
                 else
                 {
                     printf("%c",187);
+                    printf("    %.0lf",pow(2.0,nextnextnum));
                 }
             }
             else if(i == 0)
@@ -428,7 +412,7 @@ int construirjogo(int dificuldade, int matriz[dificuldade][dificuldade], int sel
                     printf("%c", 205);
                 }
             }
-            else if (i == dificuldade*5+1)
+            else if (i == 36)
             {
                 printf("%c", 205);
             }
@@ -497,12 +481,68 @@ int construirjogo(int dificuldade, int matriz[dificuldade][dificuldade], int sel
     printf("\n");
     printf("\n");
     printf("\n");
-    for (int j = 0; j < (columns - (dificuldade * 3))/2-12; ++j)
+    for (int j = 0; j < (columns - 15)/2-12; ++j)
     {
         printf(" ");
     }
     printf("S para descer o numero / Z to menu\n");
 }
+int adjacentester(int matriz[7][5],int y,int x)
+{
+    int mudou = 0;
+    int num = matriz[y][x];
+    if (num == 0)
+    {
+        return 0;
+    }
+    if (x < 4 && matriz[y][x+1] == num)
+    {
+        matriz[y][x+1] = 0;
+        matriz[y][x] +=1;
+        mudou = 1;
+    }
+    if (y > 0 && matriz[y-1][x] == num)
+    {
+        matriz[y-1][x] = 0;
+        matriz[y][x] +=1;
+        mudou = 1;
+    }
+    if (x > 0 && matriz[y][x-1] == num)
+    {
+        matriz[y][x-1] = 0;
+        matriz[y][x] +=1;
+        mudou = 1;
+    }
+    if (y < 6 && matriz[y+1][x] == num)
+    {
+        matriz[y+1][x] = 0;
+        matriz[y][x] +=1;
+        mudou = 1;
+    }
+    if (mudou == 1)
+    {
+        for (int i = 0; i < 5; ++i)
+        {
+            for (int j = 0; j < 6; ++j)
+            {
+                if (matriz[6 - j][i] == 0 && matriz[6 - j - 1][i] > 0)
+                {
+                    matriz[6 - j][i] = matriz[6 - j - 1][i];
+                    matriz[6 - j - 1][i] = 0;
+                }
+            }
+        }
+        for (int i = 0; i < 5; ++i)
+        {
+            for (int j = 0; j < 7; ++j)
+            {
+                adjacentester(matriz,j,i);
+            }
+        }
+    }
+    return 0;
+}
+
 struct ranks* organizar(struct ranks*first, int rank, char * nome)
 {
     struct ranks* temp;
@@ -600,7 +640,7 @@ int rank()
             n = getch();
             switch(n)
             {
-                case 77:
+                case 'd':
                     if (posicao != 2)
                     {
                         posicao = 2; 
@@ -608,7 +648,7 @@ int rank()
                     }
                 break;
 
-                case 75:
+                case 'a':
                     if (posicao != 1)
                     {
                         posicao = 1; 
@@ -732,12 +772,12 @@ int certeza(char *texto)
             {
                 printf(" ");
             }
-            printf("|");
+            printf("%c",201);
             for (int i = 0; i < 50; ++i)
             {
-                printf("-");
+                printf("%c",205);
             }
-            printf("|");
+            printf("%c",187);
             printf("\n");
             for (int j = 0; j < 5; ++j)
             {
@@ -745,7 +785,7 @@ int certeza(char *texto)
                 {
                     printf(" ");
                 }
-                printf("|");
+                printf("%c",186);
 
                 if (j == 0)
                 {
@@ -793,18 +833,18 @@ int certeza(char *texto)
                         printf(" ");
                     }
                 }
-                printf("|\n");
+                printf("%c\n",186);
             } 
             for (int i = 0; i < (columns - 50)/2; ++i)
             {
                 printf(" ");
             }
-            printf("|");
+            printf("%c",200);
             for (int i = 0; i < 50; ++i)
             {
-                printf("-");
+                printf("%c",205);
             }  
-            printf("|");
+            printf("%c",188);
             atualizar = 0;
         }
 
@@ -815,7 +855,7 @@ int certeza(char *texto)
             n = getch();
             switch(n)
             {
-                case 77:
+                case 'd':
                     if (posicao != 2)
                     {
                         posicao = 2; 
@@ -823,7 +863,7 @@ int certeza(char *texto)
                     }
                 break;
 
-                case 75:
+                case 'a':
                     if (posicao != 1)
                     {
                         posicao = 1; 
