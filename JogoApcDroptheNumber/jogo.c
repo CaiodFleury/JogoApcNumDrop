@@ -210,8 +210,11 @@ int jogo()
 int administrarniveis()
 {
     FILE * fnumeros = fopen("numeros.txt","r");
+    int martelocont = 512;
+    int pontos = 0;
     int nextnum;
     int nextnextnum;   
+    int martelos = 0;
     int n;
     int atualizar = 1;
     int selecionado = 1;
@@ -227,10 +230,17 @@ int administrarniveis()
 
     while (1)
     {
-
+        if (pontos>martelocont)
+        {
+            if (martelos < 3)
+            {
+                martelos+=1;
+            }
+            martelocont= martelocont*2;
+        }
         if (atualizar == 1)
         {
-            construirjogo(matriz, selecionado,nextnum,nextnextnum);
+            construirjogo(matriz, selecionado,nextnum,nextnextnum,martelos,pontos);
             atualizar = 0;
         }
 
@@ -265,55 +275,47 @@ int administrarniveis()
                         {
                             if (i == 0)
                             {
-                                int pontos = 0;
-                                for (int i = 0; i < 5; ++i)
-                                {
-                                    for (int j = 0; j < 7; ++j)
-                                    {
-                                        pontos += matriz[j][i] * matriz[j][i];
-                                    }
-                                }
                                 return pontos;
                             }
                             else
                             {
                                 matriz[i-1][selecionado-1] = nextnum;
-                                adjacentester(matriz,i-1,selecionado-1);
+                                adjacentester(matriz,i-1,selecionado-1,&pontos);
                             }
                             i = 7;
                         }
                         else if (i == 6)
                         {
                             matriz[i][selecionado-1] = nextnum;
-                            adjacentester(matriz,i,selecionado-1);
+                            adjacentester(matriz,i,selecionado-1,&pontos);
                             i = 7;
                         }
                     }
                     nextnum = nextnextnum;
                     if (fscanf(fnumeros,"%d",&nextnextnum) == EOF)
                     {
-                        int pontos = 0;
-                        for (int i = 0; i < 5; ++i)
-                        {
-                            for (int j = 0; j < 7; ++j)
-                            {
-                                pontos += matriz[j][i] * matriz[j][i];
-                            }
-                        }
                         return pontos;
                     }
                     atualizar = 1;
                 break;
 
-                case 'z':
-                    int pontos = 0;
-                    for (int i = 0; i < 5; ++i)
+                case 'q':
+                    if (martelos>0)
                     {
-                        for (int j = 0; j < 7; ++j)
+                        for (int i = 0; i < 7; ++i)
                         {
-                            pontos += matriz[j][i] * matriz[j][i];
+                            if (matriz[i][selecionado-1] != 0)
+                            {
+                                matriz[i][selecionado-1] = 0;
+                                i = 7;
+                            }
                         }
+                        atualizar = 1;
+                        martelos-=1;
                     }
+                break;
+
+                case 'z':
                     return pontos;
                 break;
             }
@@ -322,7 +324,7 @@ int administrarniveis()
     return 0;
 }
 
-int construirjogo(int matriz[][5], int selecionado , int nextnum, int nextnextnum)
+int construirjogo(int matriz[][5], int selecionado , int nextnum, int nextnextnum,int martelos,int pontos)
 {
     // i muda a linha j muda a coluna
     system("cls");
@@ -353,9 +355,44 @@ int construirjogo(int matriz[][5], int selecionado , int nextnum, int nextnextnu
     
     for (int i = 0; i < 35 + 2; ++i)
     {
-        for (int j = 0; j < ((columns - 50)-2)/2; ++j)
+        if (i < 5)
         {
-            printf(" ");
+            for (int j = 0; j < (columns - 82)/2-5; ++j)
+            {
+                printf(" ");
+            }
+            if (i == 0)
+            {
+                printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",201,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,187);
+            }
+            if (i == 1)
+            {
+                printf("%c    Pontuacao:    %c",186,186);
+            }
+            if (i == 2)
+            {
+                printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",204,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,185);
+            }
+            if (i == 3)
+            {
+                printf("%c     %5d        %c",186,pontos,186);
+                
+            }  
+            if (i == 4)
+            {
+                printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",200,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,205,188);
+            }
+            if (i == 5)
+            {
+                printf("%c%c%c%c%c%c%c%c%c%c",201,205,205,205,205,205,205,205,205,187);
+            }
+        }
+        else
+        {
+            for (int j = 0; j < (columns - 82)/2+20-5; ++j)
+            {
+                printf(" ");
+            }
         }
         for (int j = 0; j < 50 + 2; ++j)
         {
@@ -470,17 +507,53 @@ int construirjogo(int matriz[][5], int selecionado , int nextnum, int nextnextnu
         }
         if (i == 1)
         {
-            printf("%c        %c",186,186);
+            printf("%c  Next: %c",186,186);
         }
         if (i == 2)
         {
-            printf("%c%5.0lf   %c",186,pow(2.0,nextnextnum),186);
+            printf("%c%c%c%c%c%c%c%c%c%c",204,205,205,205,205,205,205,205,205,185);
+            
         }
         if (i == 3)
         {
-            printf("%c        %c",186,186);
+            printf("%c%5.0lf   %c",186,pow(2.0,nextnextnum),186);
         }  
         if (i == 4)
+        {
+            printf("%c%c%c%c%c%c%c%c%c%c",200,205,205,205,205,205,205,205,205,188);
+        }
+        if (i == 5)
+        {
+            printf("%c%c%c%c%c%c%c%c%c%c",201,205,205,205,205,205,205,205,205,187);
+        }
+        if (i == 6)
+        {
+            printf("%cMartelos%c",186,186);
+        }
+        if (i == 7)
+        {
+            printf("%c%c%c%c%c%c%c%c%c%c",204,205,205,205,205,205,205,205,205,185);
+        }
+        if (i == 8)
+        {
+            if (martelos == 3)
+            {
+                printf("%c%c%c %c%c %c%c%c",186,178,178,178,178,178,178,186);
+            }
+            else if (martelos == 2)
+            {
+                printf("%c%c%c %c%c   %c",186,178,178,178,178,186);
+            }
+            else if (martelos == 1)
+            {
+                printf("%c%c%c      %c",186,178,178,186);
+            }
+            else
+            {
+                printf("%c        %c",186,186);
+            }
+        }
+        if (i == 9)
         {
             printf("%c%c%c%c%c%c%c%c%c%c",200,205,205,205,205,205,205,205,205,188);
         }
@@ -489,13 +562,13 @@ int construirjogo(int matriz[][5], int selecionado , int nextnum, int nextnextnu
     printf("\n");
     printf("\n");
     printf("\n");
-    for (int j = 0; j < (columns - 15)/2-12; ++j)
+    for (int j = 0; j < (columns - 56)/2; ++j)
     {
         printf(" ");
     }
-    printf("S para descer o numero / Z to menu\n");
+    printf("S para descer o numero / Z to menu / Q para usar martelo\n");
 }
-int adjacentester(int matriz[7][5],int y,int x)
+int adjacentester(int matriz[7][5],int y,int x,int*pontos)
 {
     int mudou = 0;
     int num = matriz[y][x];
@@ -529,6 +602,7 @@ int adjacentester(int matriz[7][5],int y,int x)
     }
     if (mudou == 1)
     {
+        *pontos+=pow(2,matriz[y][x]);
         for (int i = 0; i < 5; ++i)
         {
             for (int j = 0; j < 6; ++j)
@@ -540,11 +614,29 @@ int adjacentester(int matriz[7][5],int y,int x)
                 }
             }
         }
+        for (int j = 0; j < 7; ++j)
+        {
+            adjacentester(matriz,j,x,pontos);
+        }
+        if (x>0)
+        {
+            for (int j = 0; j < 7; ++j)
+            {
+                adjacentester(matriz,j,x-1,pontos);
+            }
+        }
+        if (x<5)
+        {
+            for (int j = 0; j < 7; ++j)
+            {
+                adjacentester(matriz,j,x+1,pontos);
+            }
+        }
         for (int i = 0; i < 5; ++i)
         {
             for (int j = 0; j < 7; ++j)
             {
-                adjacentester(matriz,j,i);
+                adjacentester(matriz,j,i,pontos);
             }
         }
     }
