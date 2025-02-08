@@ -51,7 +51,12 @@ int main()
         else if (tela == 1)
         {
             tela = jogo();
-        }else if (tela == 2)
+            if (tela)
+            {
+                return 0;
+            }
+        }
+        else if (tela == 2)
         {
             tela = rank();
         }
@@ -167,6 +172,7 @@ void printmenu(int colunas, char*palavra) // Funcao usada no rank para colocar a
 
 int jogo()
 {
+    int win = 0;
     int contador = 1;
     struct ranks* first = 0;
     int temp;
@@ -183,9 +189,10 @@ int jogo()
         }
         fclose(testef);
     }
+    fclose(testef);
     perguntarnomejogo(nome);
     system("cls");
-    int pontos = administrarniveis();
+    int pontos = administrarniveis(&win);
     
 
     FILE* rank = fopen("ranks.bin", "rb");
@@ -205,9 +212,10 @@ int jogo()
         first = first->next;
     }
     fclose(rank);
+    return !certeza("PARABENS!!! VOCE ZEROU O JOGO!Quer continuar? ");
 }
 
-int administrarniveis()
+int administrarniveis(int * win)
 {
     FILE * fnumeros = fopen("numeros.txt","r");
     int martelocont = 512;
@@ -275,6 +283,8 @@ int administrarniveis()
                         {
                             if (i == 0)
                             {
+                                fclose(fnumeros);
+                                remove("numeros.txt");
                                 return pontos;
                             }
                             else
@@ -294,6 +304,9 @@ int administrarniveis()
                     nextnum = nextnextnum;
                     if (fscanf(fnumeros,"%d",&nextnextnum) == EOF)
                     {
+                        *win = 1;
+                        fclose(fnumeros);
+                        remove("numeros.txt");
                         return pontos;
                     }
                     atualizar = 1;
@@ -316,6 +329,8 @@ int administrarniveis()
                 break;
 
                 case 'z':
+                    fclose(fnumeros);
+                    remove("numeros.txt");
                     return pontos;
                 break;
             }
