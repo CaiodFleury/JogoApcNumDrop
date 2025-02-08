@@ -345,6 +345,12 @@ int construirjogo(int matriz[][5], int selecionado , int nextnum, int nextnextnu
         nextnum-=1;
     }
     printf(" %d \n",resp);
+    for (int j = 0; j < ((columns - 50)-2)/2 + selecionado * 10 - 5; ++j)
+    {
+        printf(" ");
+    }
+    printf("%c%c%c%c%c\n",200,205,203,205,188);
+    
     for (int i = 0; i < 35 + 2; ++i)
     {
         for (int j = 0; j < ((columns - 50)-2)/2; ++j)
@@ -381,7 +387,6 @@ int construirjogo(int matriz[][5], int selecionado , int nextnum, int nextnextnu
                 else
                 {
                     printf("%c",187);
-                    printf("    %.0lf",pow(2.0,nextnextnum));
                 }
             }
             else if(i == 0)
@@ -458,6 +463,26 @@ int construirjogo(int matriz[][5], int selecionado , int nextnum, int nextnextnu
             {
                 printf(" ");
             }
+        }
+        if (i == 0)
+        {
+            printf("%c%c%c%c%c%c%c%c%c%c",201,205,205,205,205,205,205,205,205,187);
+        }
+        if (i == 1)
+        {
+            printf("%c        %c",186,186);
+        }
+        if (i == 2)
+        {
+            printf("%c%5.0lf   %c",186,pow(2.0,nextnextnum),186);
+        }
+        if (i == 3)
+        {
+            printf("%c        %c",186,186);
+        }  
+        if (i == 4)
+        {
+            printf("%c%c%c%c%c%c%c%c%c%c",200,205,205,205,205,205,205,205,205,188);
         }
         printf("\n");
     }
