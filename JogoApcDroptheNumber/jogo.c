@@ -212,7 +212,14 @@ int jogo()
         first = first->next;
     }
     fclose(rank);
-    return !certeza("PARABENS!!! VOCE ZEROU O JOGO!Quer continuar? ");
+    if (win)
+    {
+        return !certeza("PARABENS!!! VOCE ZEROU O JOGO!Quer continuar? ");
+    }
+    else
+    {
+        return !certeza("VOCE PERDEU! Quer continuar jogando???");
+    }   
 }
 
 int administrarniveis(int * win)
