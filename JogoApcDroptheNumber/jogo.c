@@ -172,6 +172,8 @@ void printmenu(int colunas, char*palavra) // Funcao usada no rank para colocar a
 
 int jogo()
 {
+    int addnum;
+    double randaddnum;
     int win = 0;
     int contador = 1;
     struct ranks* first = 0;
@@ -185,7 +187,9 @@ int jogo()
         testef = fopen("numeros.txt","w");
         for (int i = 0; i < 500; ++i)
         {
-            fprintf(testef, "%d\n", rand()%4+1);
+            randaddnum = pow(2,rand()%4+1);
+            addnum = randaddnum;
+            fprintf(testef, "%d\n", addnum);
         }
         fclose(testef);
     }
@@ -227,14 +231,27 @@ int administrarniveis(int * win)
     FILE * fnumeros = fopen("numeros.txt","r");
     int martelocont = 512;
     int pontos = 0;
-    int nextnum;
-    int nextnextnum;   
+    int tempnextnum;
+    int tempnextnextnum;  
+    int nextnum = 0;
+    int nextnextnum = 0;   
     int martelos = 0;
     int n;
     int atualizar = 1;
     int selecionado = 1;
     int matriz[7][5];
-    fscanf(fnumeros,"%d %d",&nextnum,&nextnextnum);
+    fscanf(fnumeros,"%d %d",&tempnextnum,&tempnextnextnum);
+    while (tempnextnextnum > 0)
+    {
+        nextnextnum += 1;
+        tempnextnextnum = tempnextnextnum/2;
+    }
+    while (tempnextnum > 0)
+    {
+        nextnum += 1;
+        tempnextnum = tempnextnum/2;
+    }
+
     for (int i = 0; i < 7; ++i)
     {
         for (int j = 0; j < 5; ++j)
@@ -309,12 +326,18 @@ int administrarniveis(int * win)
                         }
                     }
                     nextnum = nextnextnum;
-                    if (fscanf(fnumeros,"%d",&nextnextnum) == EOF)
+                    if (fscanf(fnumeros,"%d",&tempnextnextnum) == EOF)
                     {
                         *win = 1;
                         fclose(fnumeros);
                         remove("numeros.txt");
                         return pontos;
+                    }
+                    nextnextnum = 0;
+                    while (tempnextnextnum > 0)
+                    {
+                        nextnextnum += 1;
+                        tempnextnextnum = tempnextnextnum/2;
                     }
                     atualizar = 1;
                 break;
