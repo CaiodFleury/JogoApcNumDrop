@@ -241,12 +241,12 @@ int administrarniveis(int * win)
     int selecionado = 1;
     int matriz[7][5];
     fscanf(fnumeros,"%d %d",&tempnextnum,&tempnextnextnum);
-    while (tempnextnextnum > 0)
+    while (tempnextnextnum > 1)
     {
         nextnextnum += 1;
         tempnextnextnum = tempnextnextnum/2;
     }
-    while (tempnextnum > 0)
+    while (tempnextnum > 1)
     {
         nextnum += 1;
         tempnextnum = tempnextnum/2;
@@ -334,7 +334,7 @@ int administrarniveis(int * win)
                         return pontos;
                     }
                     nextnextnum = 0;
-                    while (tempnextnextnum > 0)
+                    while (tempnextnextnum > 1)
                     {
                         nextnextnum += 1;
                         tempnextnextnum = tempnextnextnum/2;
