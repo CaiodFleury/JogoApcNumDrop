@@ -20,7 +20,7 @@ Esse projeto é licenciado por [MIT License](https://opensource.org/licenses/MIT
 
 ## Autores
 
-- Caio Dias Fleury ([@CaioDFleury](https://github.com/CaioDFleury)
+- Caio Dias Fleury ([@CaioDFleury](https://github.com/CaioDFleury))
   
 ---
 
